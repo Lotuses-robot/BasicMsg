@@ -24,9 +24,12 @@ void* rec(void* args)
 
 char msg[256];
 std::string s;
+char ip[128];
 
 int main()
 {
+	printf("ServerIP:");
+	scanf("%s",ip);
 	// 启动Windows socket 2.x环境
 	WORD ver = MAKEWORD(2, 2);
 	WSADATA dat;
@@ -40,13 +43,13 @@ int main()
 	sockaddr_in _sin = {};
 	_sin.sin_family = AF_INET;
 	_sin.sin_port = htons(9527);
-	_sin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	_sin.sin_addr.S_un.S_addr = inet_addr(ip);
 	int ret = connect(sock, (sockaddr*)&_sin, sizeof(sockaddr_in));
 	if (SOCKET_ERROR == ret)
 		printf("连接服务器错误...\n");
 	else
 	{
-		printf("连接Socket成功...\n完成启动。\n\n");
+		printf("连接Socket成功...\n启动完成。\n\n");
 		pthread_t tid;
 		ret=pthread_create(&tid,nullptr,rec,nullptr);
 		if(ret!=0) printf("Pthread wrong!Num:%d\n",ret);
