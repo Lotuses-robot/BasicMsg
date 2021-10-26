@@ -11,7 +11,7 @@ SOCKET sock;
 
 void* rec(void* args)
 {
-	// 接受服务器信息
+	// receive msg from server
 	while(1)
 	{
 		char recvBuf[256] = {};
@@ -30,26 +30,26 @@ int main()
 {
 	printf("ServerIP:");
 	scanf("%s",ip);
-	// 启动Windows socket 2.x环境
+	// Start Windows socket 2.x envirment
 	WORD ver = MAKEWORD(2, 2);
 	WSADATA dat;
 	WSAStartup(ver, &dat);
 	//----------------
-	// 建立一个socket
+	// creating socket
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (INVALID_SOCKET == sock)
-		printf("创建套接字错误...\n");
-	// 连接服务器 connect
+		printf("Error creating socket...\n");
+	// connect
 	sockaddr_in _sin = {};
 	_sin.sin_family = AF_INET;
 	_sin.sin_port = htons(9527);
 	_sin.sin_addr.S_un.S_addr = inet_addr(ip);
 	int ret = connect(sock, (sockaddr*)&_sin, sizeof(sockaddr_in));
 	if (SOCKET_ERROR == ret)
-		printf("连接服务器错误...\n");
+		printf("Error connect server socket...\n");
 	else
 	{
-		printf("连接Socket成功...\n启动完成。\n\n");
+		printf("connect done...\start ok.\n\n");
 		pthread_t tid;
 		ret=pthread_create(&tid,nullptr,rec,nullptr);
 		if(ret!=0) printf("Pthread wrong!Num:%d\n",ret);
