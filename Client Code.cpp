@@ -49,7 +49,7 @@ int main()
 		printf("Error connect server socket...\n");
 	else
 	{
-		printf("connect done...\start ok.\n\n");
+		printf("connect done...\nstart ok.\n\n");
 		pthread_t tid;
 		ret=pthread_create(&tid,nullptr,rec,nullptr);
 		if(ret!=0) printf("Pthread wrong!Num:%d\n",ret);
