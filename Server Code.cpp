@@ -10,44 +10,40 @@ auto _cSock = INVALID_SOCKET;
 
 void* Server_Setup(void* args)
 {
-	// Æô¶¯Windows socket 2.x»·¾³
+	// start Windows socket 2.x
 	WORD ver = MAKEWORD(2, 2);
 	WSADATA dat;
 	WSAStartup(ver, &dat);
 	//----------------
 
-	// --ÓÃSocket API½¨Á¢¼òÒ×TCP·şÎñÆ÷
-	// ´´½¨Ò»¸ösocket
+	// --use Socket API mk easy TCP server
+	// make a socket
 	SOCKET _sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	// °ó¶¨ÓÃÓÚ½ÓÊÜ¿Í»§¶ËÁ¬½ÓµÄÍøÂç¶Ë¿Ú
+	// Bind the network port used to accept client connections
 	sockaddr_in _sin = {};
 	_sin.sin_family = AF_INET;
 	_sin.sin_port = htons(9527);
 	_sin.sin_addr.S_un.S_addr = INADDR_ANY;
 	if (SOCKET_ERROR == bind(_sock, (sockaddr*)&_sin, sizeof(_sin)))
-		printf("ERROR,°ó¶¨ÓÃÓÚ½ÓÊÜ¿Í»§¶ËÁ¬½ÓµÄÍøÂç¶Ë¿ÚÊ§°Ü...\n");
-	else
-		printf("°ó¶¨¶Ë¿Ú³É¹¦...\n");
+		printf("ERROR,Binding the network port used to accept client connections failed...\n");
 
-	// ¼àÌı¶Ë¿Ú
+	// ç›‘å¬ç«¯å£
 	if (SOCKET_ERROR == listen(_sock, 5))
-		printf("¼àÌıÍøÂç¶Ë¿ÚÊ§°Ü...\n");
-	else
-		printf("¼àÌıÍøÂç¶Ë¿Ú³É¹¦...\n");
+		printf("Failed to listen to network port...\n");
 
-	// ½ÓÊÕ¿Í»§¶ËÁ¬½Ó
+	// æ¥æ”¶å®¢æˆ·ç«¯è¿æ¥
 	sockaddr_in clientAddr = {};
 	int nAddrLen = sizeof(sockaddr_in);
 
-	// Ïò¿Í»§¶Ë·¢ËÍÒ»ÌõÊı¾İ
+	// å‘å®¢æˆ·ç«¯å‘é€ä¸€æ¡æ•°æ®
 	char msgBuf[] = "HaHa, you join the server!";
 	_cSock = accept(_sock, (sockaddr*)&clientAddr, &nAddrLen);
 	if (INVALID_SOCKET == _cSock)
-		printf("½ÓÊÜµ½ÎŞĞ§¿Í»§¶ËSOCKET...\n");
-//	printf("ĞÂ¿Í»§¶Ë¼ÓÈë£ºIP = %s:%d\n", inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port);
-	puts("¿Í»§¶Ë¼ÓÈë¡£");
-//	send(_cSock, msgBuf, sizeof(msgBuf), 0); //²âÊÔÏûÏ¢
-	puts("Ò»ÇĞÆô¶¯Íê±Ï¡£\n\n");
+		printf("Invalid client received SOCKET...\n");
+//	printf("æ–°å®¢æˆ·ç«¯åŠ å…¥ï¼šIP = %s:%d\n", inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port);
+	puts("Client joined.");
+//	send(_cSock, msgBuf, sizeof(msgBuf), 0); //æµ‹è¯•æ¶ˆæ¯
+	puts("Everything ok.\n\n");
 	while(1);
 	closesocket(_sock);
 	WSACleanup();
