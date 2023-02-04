@@ -2,12 +2,48 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include <bits/stdc++.h>
+#include <cstring>
 #include <windows.h>
 #include <WinSock2.h>
 #include <cstdio>
 #include <pthread.h>
 auto _cSock = INVALID_SOCKET;
-
+char friendip[256];
+bool enable_msg=1;
+void SetTextColor(int ForgC,int BackC)
+{
+	/* this show the color code:
+	   0 black (default Back)
+	   1 blue
+	   2 green
+	   3 pale-green
+	   4 red
+	   5 purple
+	   6 yellow
+	   7 white
+	   8 grey
+	   9 light-blue
+	   10 light-green
+	   11 light-pale-green
+	   12 light-red
+	   13 light-purple
+	   14 light-yellow
+	   15 light-white (default Forg)
+	*/
+	WORD wColor = ((BackC & 0x0F) << 4) + (ForgC & 0x0F);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),wColor);
+}
+void System_Msg(char sysmsg[256])
+{
+	SetTextColor(2,0); 
+	printf("BasicMsg");
+	for(int i=1;i<=(strlen(friendip)-8);i++) printf(" ");
+	SetTextColor(8,0);
+	printf(" | ");
+	SetTextColor(2,0);
+	printf("%s\n",sysmsg);
+	SetTextColor(15,0);
+}
 void* Server_Setup(void* args)
 {
 	// start Windows socket 2.x
@@ -38,12 +74,15 @@ void* Server_Setup(void* args)
 	// 向客户端发送一条数据
 	char msgBuf[] = "HaHa, you join the server!";
 	_cSock = accept(_sock, (sockaddr*)&clientAddr, &nAddrLen);
-	if (INVALID_SOCKET == _cSock)
-		printf("Invalid client received SOCKET...\n");
-//	printf("新客户端加入：IP = %s:%d\n", inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port);
-	puts("Client joined.");
-//	send(_cSock, msgBuf, sizeof(msgBuf), 0); //测试消息
-	puts("Everything ok.\n\n");
+	if (INVALID_SOCKET == _cSock) printf("Invalid client received SOCKET...\n");
+	//printf("新客户端加入：IP = %s:%d\n", inet_ntoa(clientAddr.sin_addr), clientAddr.sin_port);
+
+    //send(_cSock, msgBuf, sizeof(m sgBuf), 0); //测试消息
+	strcpy(friendip,inet_ntoa(clientAddr.sin_addr));
+	char* text = "Client joined.";
+	System_Msg(text);
+	text = "Everything OK.";
+	System_Msg(text);
 	while(1);
 	closesocket(_sock);
 	WSACleanup();
@@ -56,7 +95,15 @@ void* rec(void* args)
 	while(1)
 	{
 		nlen=recv(_cSock,r,1024,0);
-		if(nlen>0) printf("%s\n",r);
+		if(nlen>0 && enable_msg) 
+		{
+			SetTextColor(13,0);
+			printf("%s",friendip);
+			SetTextColor(8,0);
+			printf(" | ");
+			SetTextColor(15,0);
+			printf("%s\n",r);
+		}
 	}
 }
 
@@ -76,9 +123,22 @@ int main()
 		{
 			if(strcmp(msg,"")!=0)
 			{
-				s="> ";
-				s+=msg;
-				send(_cSock,s.c_str(),sizeof(msg),0);
+				s=msg;
+				if(s=="cls") system("cls");
+				else if(s=="enable msg")
+				{
+					enable_msg=1;
+					char* text="Message enabled.You'll able to see the messages.";
+					System_Msg(text);
+				}
+				else if(s=="disable msg")
+				{
+					enable_msg=0;
+					char* text="Message disabled.You won't able to see the messages.";
+					System_Msg(text);					
+				}
+				else send(_cSock,s.c_str(),sizeof(msg),0);
+				
 			}
 			gets(msg);
 		}
